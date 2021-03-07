@@ -1,0 +1,14 @@
+mining:
+  display: unpaid,wallet
+  enabled: true
+  key:
+  organisation:
+  secret:
+  walletcurrency: cad
+ticker:
+  coinname: true
+  currency: litecoin,ravencoin,bitcoin,ethereum,stellar,bitcoin-cash,monero,mithril
+  exchange: default
+  fiatcurrency: cad
+  sparklinedays: 7
+  updatefrequency: 30
