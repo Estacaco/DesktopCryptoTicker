@@ -1,3 +1,12 @@
+colours:
+  date: black
+  days: black
+  nicehash: orange
+  price: black
+  #sparkline colours are single letter rgbk
+  sparkline: g
+  point: r
+  axline: k
 mining:
   key:
   organisation:
@@ -7,8 +16,3 @@ ticker:
   fiatcurrency: cad
   sparklinedays: 7
   updatefrequency: 30
-colours:
-  nicehash: orange
-  date: black
-  price: black
-  days: black
