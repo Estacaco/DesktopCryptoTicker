@@ -102,6 +102,7 @@ def makeSpark(config, pricestack):
     plt.close(fig) # Close plot
 
 def Draw(config,pricestack,whichcoin,fiat,other):
+    root.overrideredirect(1)
     crypto_list = currencystringtolist(config['ticker']['currency'])
     host = 'https://api2.nicehash.com'
     organisation_id = str(config['mining']['organisation'])
@@ -203,6 +204,21 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     if str(time.strftime("%H:%M")) == "16:20":
         print('420 BLAZE IT')
 
+    button = tk.Button(root, text=' X ', command=lambda: [threading.Timer(0, Refresher).cancel(),root.destroy(), exit()], fg='red',font=('Franklin Gothic Medium', 16, 'bold'))
+    button.place(x=438, y=0)
+
+
+    load3 = Image.open(os.path.join(picdir,'arrow.png'))
+    render3 = ImageTk.PhotoImage(load3)
+    arrow = Label(image=render3, borderwidth=0,highlightthickness = 0)
+    arrow.image = render3
+    button1=tk.Button(root, image=render3, command=Refresher)
+
+    button1.place(x=415, y=100)
+
+
+
+
     print ('writing config')
 def Refresher():
 
@@ -236,7 +252,6 @@ def Refresher():
     for widget in frame.winfo_children():
         widget.destroy()
     print ('refreshing')
-
     threading.Timer(float(config['ticker']['updatefrequency']), Refresher).start()
     Draw(config, pricestack, CURRENCY, FIAT, other)
 
