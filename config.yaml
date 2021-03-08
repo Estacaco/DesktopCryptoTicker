@@ -7,3 +7,8 @@ ticker:
   fiatcurrency: cad
   sparklinedays: 7
   updatefrequency: 30
+colours:
+  nicehash: orange
+  date: black
+  price: black
+  days: black
