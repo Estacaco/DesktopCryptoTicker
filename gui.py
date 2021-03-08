@@ -204,15 +204,15 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     if str(time.strftime("%H:%M")) == "16:20":
         print('420 BLAZE IT')
 
-    button = tk.Button(root, text=' X ', command=lambda: [threading.Timer(0, Refresher).cancel(),root.destroy(), exit()], fg='red',font=('Franklin Gothic Medium', 16, 'bold'))
-    button.place(x=438, y=0)
+    button = tk.Button(root, text=' X ', bd=0, bg='red', command=lambda: [threading.Timer(0, Refresher).cancel(),root.destroy(), exit()], fg='white',font=('Franklin Gothic Medium', 16, 'bold'))
+    button.place(x=442, y=0)
 
 
     load3 = Image.open(os.path.join(picdir,'arrow.png'))
     render3 = ImageTk.PhotoImage(load3)
     arrow = Label(image=render3, borderwidth=0,highlightthickness = 0)
     arrow.image = render3
-    button1=tk.Button(root, image=render3, command=Refresher)
+    button1=tk.Button(root, image=render3, command=Refresher, bd=0, bg=(config['colours']['bg']))
 
     button1.place(x=415, y=100)
 
