@@ -7,8 +7,15 @@ import json
 from hashlib import sha256
 import optparse
 import sys
+import yaml
+configfile = "config.yaml"
 
 
+def currencystringtolist(currstring):
+    # Takes the string for currencies in the config.yaml file and turns it into a list
+    curr_list = currstring.split(",")
+    curr_list = [x.strip(' ') for x in curr_list]
+    return curr_list
 class public_api:
 
     def __init__(self, host, verbose=False):
@@ -161,8 +168,12 @@ class private_api:
 
         return algo_setting
 
+
     def get_accounts(self):
-        return self.request('GET', '/main/api/v2/accounting/accounts2/', 'fiat=cad', None)
+        with open(configfile) as f:
+            config = yaml.load(f, Loader=yaml.FullLoader)
+        fiat_list=currencystringtolist(config['ticker']['fiatcurrency'])
+        return self.request('GET', '/main/api/v2/accounting/accounts2/', 'fiat='+fiat_list[0], None)
 
     def get_accounts_for_currency(self, currency):
         return self.request('GET', '/main/api/v2/accounting/account2/' + currency, '', None)

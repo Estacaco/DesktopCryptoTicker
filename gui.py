@@ -47,8 +47,8 @@ def currencycycle(curr_list):
     # Rotate the array of currencies from config.... [a b c] becomes [b c a]
     curr_list = curr_list[1:]+curr_list[:1]
     return curr_list
-def getData(config,whichcoin,other):
-    geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=cad&ids="+whichcoin
+def getData(config,whichcoin, fiat, other):
+    geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency="+fiat+"&ids="+whichcoin
     rawlivecoin = requests.get(geckourl).json()
     logging.info(rawlivecoin[0])   
     liveprice = rawlivecoin[0]
@@ -61,7 +61,7 @@ def getData(config,whichcoin,other):
     starttime = endtime - 60*60*24*days_ago
     starttimeseconds = starttime
     endtimeseconds = endtime  
-    geckourlhistorical = "https://api.coingecko.com/api/v3/coins/"+whichcoin+"/market_chart/range?vs_currency=cad&from="+str(starttimeseconds)+"&to="+str(endtimeseconds)
+    geckourlhistorical = "https://api.coingecko.com/api/v3/coins/"+whichcoin+"/market_chart/range?vs_currency="+fiat+"&from="+str(starttimeseconds)+"&to="+str(endtimeseconds)
     print("got geckourlhistorical")
     rawtimeseries = requests.get(geckourlhistorical).json()
     print("Got price for the last "+str(days_ago)+" days from CoinGecko")
@@ -106,10 +106,9 @@ def makeSpark(pricestack):
     ax.cla() # Close axis to prevent memory error
     plt.close(fig) # Close plot
 
-def Draw(config,pricestack,whichcoin,other):
+def Draw(config,pricestack,whichcoin,fiat,other):
     crypto_list = currencystringtolist(config['ticker']['currency'])
-    crypto_list = currencycycle(crypto_list)
-    whichcoin = crypto_list[0]
+#    whichcoin = crypto_list[0]
     host = 'https://api2.nicehash.com'
     organisation_id = str(config['mining']['organisation'])
     key = str(config['mining']['key'])
@@ -137,7 +136,7 @@ def Draw(config,pricestack,whichcoin,other):
     ok = working * 100000000 #make whole number
     unpfd = int(ok) #convert to integer to drop decimals
     unpf = str(unpfd)
-    geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=cad&ids="+whichcoin
+    geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency="+fiat+"&ids="+whichcoin
     rawlivecoin = requests.get(geckourl).json()
     logging.info(rawlivecoin[0])   
     liveprice = rawlivecoin[0]
@@ -215,22 +214,20 @@ def Refresher():
     with open(configfile) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
-    config['display']['orientation']=int(config['display']['orientation'])
     crypto_list = currencystringtolist(config['ticker']['currency'])
     fiat_list=currencystringtolist(config['ticker']['fiatcurrency'])
-    mdisplay_list=currencystringtolist(config['mining']['display'])
     crypto_list = currencycycle(crypto_list)
     CURRENCY=crypto_list[0]
     FIAT=fiat_list[0]
-    MDISPLAY=mdisplay_list[0]
-    pricestack, ATH = getData(config,CURRENCY, other)
+    pricestack, ATH = getData(config,CURRENCY, FIAT, other)
+    getData(config,CURRENCY,FIAT,other)
+    makeSpark(pricestack)
     config['ticker']['currency']=",".join(crypto_list)
     config['ticker']['fiatcurrency']=",".join(fiat_list)
-    config['mining']['display']=",".join(mdisplay_list)
     with open(configfile, 'w') as f:
         data = yaml.dump(config, f)
 
-    makeSpark(pricestack)
+
     for widget in frame2.winfo_children():
         widget.destroy()
     for widget in frame3.winfo_children():
@@ -241,11 +238,13 @@ def Refresher():
         widget.destroy()
     for widget in frame6.winfo_children():
         widget.destroy()
+    for widget in frame.winfo_children():
+        widget.destroy()
 #    frame.pack_forget()
     print ('refreshing')
-    getData(config,CURRENCY,other)
-    threading.Timer(10, Refresher).start()
-    Draw(config, pricestack, CURRENCY, other)
+
+    threading.Timer(float(config['ticker']['updatefrequency']), Refresher).start()
+    Draw(config, pricestack, CURRENCY, FIAT, other)
 
 
 
