@@ -171,33 +171,33 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     frame2.place(x=20,y=124)
 
 
-    text=Label(frame2,textvariable=output, fg='black', font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    text=Label(frame2,textvariable=output, fg=(config['colours']['price']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
     text.pack()
 
     frame3.place(x=170,y=50)
     tbal = tk.StringVar()
     tbal.set('NiceHash Wallet Balance: $'+final)
 
-    tbal2=Label(frame3,textvariable=tbal, fg='orange', font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    tbal2=Label(frame3,textvariable=tbal, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
     tbal2.pack()
 
     frame4.place(x=170,y=70)
     unpv = tk.StringVar()
     unpv.set('NiceHash Unpaid Mining: '+unpf+' Sat')
 
-    upt=Label(frame4,textvariable=unpv, fg='orange', font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    upt=Label(frame4,textvariable=unpv, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
     upt.pack()
 
     frame5.place(x=250,y=120)
     sline = tk.StringVar()
     sline.set(str(days_ago+' day : '+pricechange))
-    sline2=Label(frame5,textvariable=sline, fg='black', font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    sline2=Label(frame5,textvariable=sline, fg=(config['colours']['days']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
     sline2.pack()
 
     frame6.place(x=200,y=20)
     ctime = tk.StringVar()
     ctime.set(str(time.strftime("%H:%M %a %d %b %Y")))
-    ctime2=Label(frame6,textvariable=ctime, fg='black', font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    ctime2=Label(frame6,textvariable=ctime, fg=(config['colours']['date']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
     ctime2.pack()
     if str(time.strftime("%H:%M")) == "16:20":
         print('420 BLAZE IT')
