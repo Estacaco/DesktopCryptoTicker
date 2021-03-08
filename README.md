@@ -3,7 +3,7 @@ Crypto Ticker that can be run on your desktop or pi written in Python. Also disp
 Pulls Crypto data and images from CoinGecko.
 
 
-![Sample](/images/Examples/Sample2.png)
+![Sample](/images/Examples/Sample.png)
 
 # Requirements
 Requires your NiceHash API keys put into the config file.
