@@ -74,14 +74,14 @@ def getData(config,whichcoin, fiat, other):
     timeseriesstack.append(pricenow)
     return timeseriesstack, other
 
-def makeSpark(pricestack):
+def makeSpark(config, pricestack):
     # Draw and save the sparkline that represents historical data
 
     # Subtract the mean from the sparkline to make the mean appear on the plot (it's really the x axis)    
     x = pricestack-np.mean(pricestack)
 
     fig, ax = plt.subplots(1,1,figsize=(10,3))
-    plt.plot(x, color='k', linewidth=6)
+    plt.plot(x, color=(config['colours']['sparkline']), linewidth=6)
     plt.plot(len(x)-1, x[-1], color='r', marker='o')
 
     # Remove the Y axis
@@ -89,7 +89,7 @@ def makeSpark(pricestack):
         v.set_visible(False)
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.axhline(c='k', linewidth=4, linestyle=(0, (5, 2, 1, 2)))
+    ax.axhline(c=(config['colours']['axline']), linewidth=4, linestyle=(0, (5, 2, 1, 2)))
 
     # Save the resulting bmp file to the images directory
     plt.savefig(os.path.join(picdir,'spark.png'), dpi=60)
@@ -215,7 +215,7 @@ def Refresher():
     CURRENCY=crypto_list[0]
     FIAT=fiat_list[0]
     pricestack, ATH = getData(config,CURRENCY, FIAT, other)
-    makeSpark(pricestack)
+    makeSpark(config, pricestack)
     config['ticker']['currency']=",".join(crypto_list)
     config['ticker']['fiatcurrency']=",".join(fiat_list)
     with open(configfile, 'w') as f:
