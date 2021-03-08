@@ -4,9 +4,10 @@ colours:
   nicehash: orange
   price: black
   #sparkline colours are single letter rgbk
-  sparkline: g
+  sparkline: k
   point: r
   axline: k
+  bg: white
 mining:
   key:
   organisation:
