@@ -22,21 +22,22 @@ configfile = "config.yaml"
 picdir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'images')
 
 root=tk.Tk()
-
+with open(configfile) as f:
+    config = yaml.load(f, Loader=yaml.FullLoader)
 frame=tk.Frame(root,width=480,height=320)
 
-frame.configure(bg="white")
+frame.configure(bg=(config['colours']['bg']))
 frame.pack()
 frame2=tk.Frame(root,width=100,height=100)
 frame3=tk.Frame(root,width=100,height=100)
 frame4=tk.Frame(root,width=100,height=100)
 frame5=tk.Frame(root,width=100,height=100)
 frame6=tk.Frame(root,width=100,height=100)
-frame2.configure(bg="white")
-frame3.configure(bg="white")
-frame4.configure(bg="white")
-frame5.configure(bg="white")
-frame6.configure(bg="white")
+frame2.configure(bg=(config['colours']['bg']))
+frame3.configure(bg=(config['colours']['bg']))
+frame4.configure(bg=(config['colours']['bg']))
+frame5.configure(bg=(config['colours']['bg']))
+frame6.configure(bg=(config['colours']['bg']))
 def currencystringtolist(currstring):
     # Takes the string for currencies in the config.yaml file and turns it into a list
     curr_list = currstring.split(",")
@@ -80,9 +81,10 @@ def makeSpark(config, pricestack):
     # Subtract the mean from the sparkline to make the mean appear on the plot (it's really the x axis)    
     x = pricestack-np.mean(pricestack)
 
-    fig, ax = plt.subplots(1,1,figsize=(10,3))
+    fig, ax = plt.subplots(1,1,figsize=(10,3),facecolor=(config['colours']['bg']))
+    ax.set_facecolor((config['colours']['bg']))
     plt.plot(x, color=(config['colours']['sparkline']), linewidth=6)
-    plt.plot(len(x)-1, x[-1], color='r', marker='o')
+    plt.plot(len(x)-1, x[-1], color=(config['colours']['point']), marker='o')
 
     # Remove the Y axis
     for k,v in ax.spines.items():
@@ -90,7 +92,6 @@ def makeSpark(config, pricestack):
     ax.set_xticks([])
     ax.set_yticks([])
     ax.axhline(c=(config['colours']['axline']), linewidth=4, linestyle=(0, (5, 2, 1, 2)))
-
     # Save the resulting bmp file to the images directory
     plt.savefig(os.path.join(picdir,'spark.png'), dpi=60)
     imgspk = Image.open(os.path.join(picdir,'spark.png'))
@@ -137,7 +138,7 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     print ('$'+pricenow+'/'+whichcoin)
     output = tk.StringVar()
     output.set('$'+pricenow+'/'+whichcoin)
-    currencythumbnail= 'currency/'+whichcoin+'.bmp'
+    currencythumbnail= 'currency/'+whichcoin+'.png'
     tokenfilename = os.path.join(picdir,currencythumbnail)
     if os.path.isfile(tokenfilename):
         load = Image.open(tokenfilename)
@@ -149,7 +150,7 @@ def Draw(config,pricestack,whichcoin,fiat,other):
         load = Image.open(requests.get(rawimage['image']['large'], stream=True).raw).convert("RGBA")
         resize = 125,125
         load.thumbnail(resize, Image.ANTIALIAS)
-        new_image = Image.new("RGBA", (125,125), "WHITE") # Create a white rgba background with a 10 pixel border
+        new_image = Image.new("RGBA", (125,125)) # Create a white rgba background with a 10 pixel border
         new_image.paste(load, (0, 0), load)   
         load=new_image
         load.thumbnail((125,125),Image.ANTIALIAS)
@@ -157,47 +158,47 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     pricechange = str("%+d" % round((pricestack[-1]-pricestack[0])/pricestack[-1]*100,2))+"%"
     days_ago=str(config['ticker']['sparklinedays']) 
     render = ImageTk.PhotoImage(load)
-    img = Label(image=render, borderwidth=0,highlightthickness = 0)
+    img = Label(image=render, borderwidth=0,highlightthickness = 0,bg=(config['colours']['bg']))
     img.image = render
     img.place(x=25, y=4)
 
     load2 = Image.open(os.path.join(picdir,'spark.bmp'))
     render2 = ImageTk.PhotoImage(load2)
     img = Label(image=render2, borderwidth=0,highlightthickness = 0)
-    img.config(highlightbackground='white')
+
     img.image = render2
     img.place(x=-65, y=145)
 
     frame2.place(x=20,y=124)
 
 
-    text=Label(frame2,textvariable=output, fg=(config['colours']['price']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    text=Label(frame2,textvariable=output, fg=(config['colours']['price']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     text.pack()
 
     frame3.place(x=170,y=50)
     tbal = tk.StringVar()
     tbal.set('NiceHash Wallet Balance: $'+final)
 
-    tbal2=Label(frame3,textvariable=tbal, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    tbal2=Label(frame3,textvariable=tbal, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     tbal2.pack()
 
     frame4.place(x=170,y=70)
     unpv = tk.StringVar()
     unpv.set('NiceHash Unpaid Mining: '+unpf+' Sat')
 
-    upt=Label(frame4,textvariable=unpv, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    upt=Label(frame4,textvariable=unpv, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     upt.pack()
 
     frame5.place(x=250,y=120)
     sline = tk.StringVar()
     sline.set(str(days_ago+' day : '+pricechange))
-    sline2=Label(frame5,textvariable=sline, fg=(config['colours']['days']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    sline2=Label(frame5,textvariable=sline, fg=(config['colours']['days']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     sline2.pack()
 
     frame6.place(x=200,y=20)
     ctime = tk.StringVar()
     ctime.set(str(time.strftime("%H:%M %a %d %b %Y")))
-    ctime2=Label(frame6,textvariable=ctime, fg=(config['colours']['date']), font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
+    ctime2=Label(frame6,textvariable=ctime, fg=(config['colours']['date']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     ctime2.pack()
     if str(time.strftime("%H:%M")) == "16:20":
         print('420 BLAZE IT')
