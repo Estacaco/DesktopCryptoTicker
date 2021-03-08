@@ -2,7 +2,6 @@ import nicehash
 import time
 import urllib, json
 import requests
-import logging
 import tkinter as tk
 import threading
 from tkinter import *
@@ -49,22 +48,21 @@ def currencycycle(curr_list):
     return curr_list
 def getData(config,whichcoin, fiat, other):
     geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency="+fiat+"&ids="+whichcoin
-    rawlivecoin = requests.get(geckourl).json()
-    logging.info(rawlivecoin[0])   
+    rawlivecoin = requests.get(geckourl).json()  
     liveprice = rawlivecoin[0]
     pricenow= float(liveprice['current_price'])
     alltimehigh = float(liveprice['ath'])
     other['volume'] = float(liveprice['total_volume'])
-    logging.info("Getting Data")
+    print('Getting Data')
     days_ago=int(config['ticker']['sparklinedays'])   
     endtime = int(time.time())
     starttime = endtime - 60*60*24*days_ago
     starttimeseconds = starttime
     endtimeseconds = endtime  
     geckourlhistorical = "https://api.coingecko.com/api/v3/coins/"+whichcoin+"/market_chart/range?vs_currency="+fiat+"&from="+str(starttimeseconds)+"&to="+str(endtimeseconds)
-    print("got geckourlhistorical")
+    print('Got geckourlhistorical')
     rawtimeseries = requests.get(geckourlhistorical).json()
-    print("Got price for the last "+str(days_ago)+" days from CoinGecko")
+    print('Got price for the last '+str(days_ago)+' days from CoinGecko')
     timeseriesarray = rawtimeseries['prices']
     timeseriesstack = []
     length=len (timeseriesarray)
@@ -74,10 +72,6 @@ def getData(config,whichcoin, fiat, other):
         i+=1
 
     timeseriesstack.append(pricenow)
-    if pricenow>alltimehigh:
-        other['ATH']=True
-    else:
-        other['ATH']=False
     return timeseriesstack, other
 
 def makeSpark(pricestack):
@@ -108,7 +102,6 @@ def makeSpark(pricestack):
 
 def Draw(config,pricestack,whichcoin,fiat,other):
     crypto_list = currencystringtolist(config['ticker']['currency'])
-#    whichcoin = crypto_list[0]
     host = 'https://api2.nicehash.com'
     organisation_id = str(config['mining']['organisation'])
     key = str(config['mining']['key'])
@@ -137,11 +130,11 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     unpfd = int(ok) #convert to integer to drop decimals
     unpf = str(unpfd)
     geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency="+fiat+"&ids="+whichcoin
-    rawlivecoin = requests.get(geckourl).json()
-    logging.info(rawlivecoin[0])   
+    rawlivecoin = requests.get(geckourl).json()   
     liveprice = rawlivecoin[0]
     pricenow= float(liveprice['current_price'])
     pricenow = str(pricenow)
+    print ('$'+pricenow+'/'+whichcoin)
     output = tk.StringVar()
     output.set('$'+pricenow+'/'+whichcoin)
     currencythumbnail= 'currency/'+whichcoin+'.bmp'
@@ -150,7 +143,7 @@ def Draw(config,pricestack,whichcoin,fiat,other):
         load = Image.open(tokenfilename)
 
     else:
-        logging.info("Getting token Image from Coingecko")
+        print('Getting token Image from Coingecko')
         tokenimageurl = "https://api.coingecko.com/api/v3/coins/"+whichcoin+"?tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false"
         rawimage = requests.get(tokenimageurl).json()
         load = Image.open(requests.get(rawimage['image']['large'], stream=True).raw).convert("RGBA")
@@ -206,6 +199,8 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     ctime.set(str(time.strftime("%H:%M %a %d %b %Y")))
     ctime2=Label(frame6,textvariable=ctime, fg='black', font=('Franklin Gothic Medium', 12, 'bold'), bg='white')
     ctime2.pack()
+    if str(time.strftime("%H:%M")) == "16:20":
+        print('420 BLAZE IT')
 
     print ('writing config')
 def Refresher():
@@ -220,7 +215,6 @@ def Refresher():
     CURRENCY=crypto_list[0]
     FIAT=fiat_list[0]
     pricestack, ATH = getData(config,CURRENCY, FIAT, other)
-    getData(config,CURRENCY,FIAT,other)
     makeSpark(pricestack)
     config['ticker']['currency']=",".join(crypto_list)
     config['ticker']['fiatcurrency']=",".join(fiat_list)
@@ -240,7 +234,6 @@ def Refresher():
         widget.destroy()
     for widget in frame.winfo_children():
         widget.destroy()
-#    frame.pack_forget()
     print ('refreshing')
 
     threading.Timer(float(config['ticker']['updatefrequency']), Refresher).start()
