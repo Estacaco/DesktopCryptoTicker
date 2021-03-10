@@ -47,6 +47,7 @@ def currencycycle(curr_list):
     # Rotate the array of currencies from config.... [a b c] becomes [b c a]
     curr_list = curr_list[1:]+curr_list[:1]
     return curr_list
+
 def getData(config,whichcoin, fiat, other):
     geckourl = "https://api.coingecko.com/api/v3/coins/markets?vs_currency="+fiat+"&ids="+whichcoin
     rawlivecoin = requests.get(geckourl).json()  
@@ -156,8 +157,10 @@ def Draw(config,pricestack,whichcoin,fiat,other):
         load=new_image
         load.thumbnail((125,125),Image.ANTIALIAS)
         load.save(tokenfilename)
+
     pricechange = str("%+d" % round((pricestack[-1]-pricestack[0])/pricestack[-1]*100,2))+"%"
     days_ago=str(config['ticker']['sparklinedays']) 
+
     render = ImageTk.PhotoImage(load)
     img = Label(image=render, borderwidth=0,highlightthickness = 0,bg=(config['colours']['bg']))
     img.image = render
@@ -166,41 +169,41 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     load2 = Image.open(os.path.join(picdir,'spark.bmp'))
     render2 = ImageTk.PhotoImage(load2)
     img = Label(image=render2, borderwidth=0,highlightthickness = 0)
-
     img.image = render2
     img.place(x=-65, y=145)
 
     frame2.place(x=20,y=124)
-
-
     text=Label(frame2,textvariable=output, fg=(config['colours']['price']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     text.pack()
+    if config['mining']['enabled'] == True:
+        frame3.place(x=170,y=50)
+        tbal = tk.StringVar()
+        tbal.set('NiceHash Wallet Balance: $'+final)
 
-    frame3.place(x=170,y=50)
-    tbal = tk.StringVar()
-    tbal.set('NiceHash Wallet Balance: $'+final)
+        tbal2=Label(frame3,textvariable=tbal, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
+        tbal2.pack()
 
-    tbal2=Label(frame3,textvariable=tbal, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
-    tbal2.pack()
+        frame4.place(x=170,y=70)
+        unpv = tk.StringVar()
+        unpv.set('NiceHash Unpaid Mining: '+unpf+' Sat')
 
-    frame4.place(x=170,y=70)
-    unpv = tk.StringVar()
-    unpv.set('NiceHash Unpaid Mining: '+unpf+' Sat')
-
-    upt=Label(frame4,textvariable=unpv, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
-    upt.pack()
+        upt=Label(frame4,textvariable=unpv, fg=(config['colours']['nicehash']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
+        upt.pack()
 
     frame5.place(x=250,y=120)
     sline = tk.StringVar()
     sline.set(str(days_ago+' day : '+pricechange))
+
     sline2=Label(frame5,textvariable=sline, fg=(config['colours']['days']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     sline2.pack()
 
-    frame6.place(x=200,y=20)
+    frame6.place(x=200,y=8)
     ctime = tk.StringVar()
     ctime.set(str(time.strftime("%H:%M %a %d %b %Y")))
+
     ctime2=Label(frame6,textvariable=ctime, fg=(config['colours']['date']), font=('Franklin Gothic Medium', 12, 'bold'), bg=(config['colours']['bg']))
     ctime2.pack()
+
     if str(time.strftime("%H:%M")) == "16:20":
         print('420 BLAZE IT')
 
@@ -212,12 +215,9 @@ def Draw(config,pricestack,whichcoin,fiat,other):
     render3 = ImageTk.PhotoImage(load3)
     arrow = Label(image=render3, borderwidth=0,highlightthickness = 0)
     arrow.image = render3
-    button1=tk.Button(root, image=render3, command=Refresher, bd=0, bg=(config['colours']['bg']))
-
-    button1.place(x=415, y=100)
-
-
-
+    if config['ticker']['cycle'] == True:
+        button1=tk.Button(root, image=render3, command=lambda: [threading.Timer(0, Refresher).cancel(),Refresher], bd=0, bg=(config['colours']['bg']))
+        button1.place(x=415, y=100)
 
     print ('writing config')
 def Refresher():
@@ -228,7 +228,8 @@ def Refresher():
 
     crypto_list = currencystringtolist(config['ticker']['currency'])
     fiat_list=currencystringtolist(config['ticker']['fiatcurrency'])
-    crypto_list = currencycycle(crypto_list)
+    if config['ticker']['cycle'] == True:
+        crypto_list = currencycycle(crypto_list)
     CURRENCY=crypto_list[0]
     FIAT=fiat_list[0]
     pricestack, ATH = getData(config,CURRENCY, FIAT, other)
@@ -252,12 +253,8 @@ def Refresher():
     for widget in frame.winfo_children():
         widget.destroy()
     print ('refreshing')
-    threading.Timer(float(config['ticker']['updatefrequency']), Refresher).start()
+
     Draw(config, pricestack, CURRENCY, FIAT, other)
-
-
-
-
-
+    threading.Timer(float(config['ticker']['updatefrequency']), Refresher).start()
 Refresher()
 root.mainloop()
