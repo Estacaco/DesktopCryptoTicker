@@ -9,6 +9,7 @@ colours:
   axline: k
   bg: white
 mining:
+  enabled: true
   key:
   organisation:
   secret:
